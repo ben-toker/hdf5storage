@@ -616,7 +616,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
             np.complex64,
             np.complex128,
             np.bytes_,
-            np.unicode_,
+            np.str_,
             np.object_,
         )
         self._numpy_types: Tuple[Union[str, Type[Any]], ...] = self.types
@@ -666,7 +666,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
             np.complex64: "single",
             np.complex128: "double",
             np.bytes_: "char",
-            np.unicode_: "char",
+            np.str_: "char",
             np.object_: "cell",
         }
 
@@ -685,7 +685,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
             "int64": np.int64,
             "single": np.float32,
             "double": np.float64,
-            "char": np.unicode_,
+            "char": np.str_,
             "cell": np.object_,
             "canonical empty": np.float64,
             "struct": np.object_,
@@ -766,7 +766,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
         # than the length of the strings); then it will be simply
         # converted to uint32's byte for byte instead.
 
-        if data.dtype.type == np.unicode_:
+        if data.dtype.type == np.str_:
             new_data2 = None
             if f.options.convert_numpy_str_to_utf16:
                 with contextlib.suppress(Exception):
@@ -774,7 +774,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
             if (
                 new_data2 is None
                 or (
-                    type(data_to_store) == np.unicode_
+                    type(data_to_store) == np.str_
                     and len(data_to_store) != len(new_data2)
                 )
                 or (
@@ -1402,7 +1402,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
                     )
             elif underlying_type.startswith("str") or matlab_class == "char":
                 if underlying_type == "str":
-                    data = np.unicode_("")
+                    data = np.str_("")
                 elif underlying_type.startswith("str"):
                     data = convert_to_numpy_str(
                         data,
@@ -1434,7 +1434,7 @@ class NumpyScalarArrayMarshaller(TypeMarshaller):
                         data = data.flat[0]
                 elif underlying_type.startswith("str"):
                     if python_empty == 1:
-                        data = np.unicode_("")
+                        data = np.str_("")
                     elif isinstance(data, np.ndarray):
                         data = data.flat[0]
                 else:
@@ -1667,7 +1667,7 @@ class PythonStringMarshaller(NumpyScalarArrayMarshaller):
         # appropriate type (str to np.str_ and the others to np.bytes_).
         cdata: Union[np.str_, np.bytes_]
         if isinstance(data, str):
-            cdata = np.unicode_(data)
+            cdata = np.str_(data)
         else:
             cdata = np.bytes_(data)
 
@@ -1793,7 +1793,7 @@ class PythonDictMarshaller(TypeMarshaller):
         tps: Dict[Type[Any], bytes] = {
             str: b"t",
             bytes: b"b",
-            np.unicode_: b"U",
+            np.str_: b"U",
             np.bytes_: b"S",
         }
 
